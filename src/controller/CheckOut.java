@@ -28,7 +28,7 @@ public class CheckOut {
 
         // Hiển thị giỏ hàng và tổng tiền cần thanh toán
         System.out.println(cartService.getCart());
-        double totalAmount = cartService.TONG();
+        double totalAmount = cartService.getTotal();
         System.out.printf("Tổng tiền cần thanh toán: %.2f\n", totalAmount);
 
         // Xác nhận thanh toán
@@ -39,7 +39,7 @@ public class CheckOut {
         }
 
         String address = InputHelper.getString("Nhập địa chỉ giao hàng: ");
-        String phone = InputHelper.getString("Nhập số điện thoại: ");
+        String phone = String.valueOf(InputHelper.getInt("Nhập số điện thoại: "));
         String notes = InputHelper.getString("Ghi chú (nếu có): ");
 
         String choice = InputHelper.getString("Phương thức thanh toán (COD/ATM): ");
@@ -56,7 +56,7 @@ public class CheckOut {
                 return;
             }
 
-            List<BankCard> userCards = bankCardService.getCardsForUser(username);
+            List<BankCard> userCards = bankCardService.getCardsByUsername(username);
             if (userCards.isEmpty()) {
                 System.out.println(" Bạn chưa liên kết thẻ ngân hàng. Vui lòng liên kết thẻ trước khi thanh toán.");
                 return;

@@ -13,11 +13,11 @@ public class OrderView {
 
     public void viewOrderHistory() {
         while (true) {
-            System.out.println("\n--- LỊCH SỬ ĐƠN HÀNG ---");
+            System.out.println("\n===  LỊCH SỬ ĐƠN HÀNG ===");
 
             String username = Session.getCurrentUsername();
             if (username == null) {
-                System.out.println("Bạn chưa đăng nhập.");
+                System.out.println("⚠️ Bạn chưa đăng nhập.");
                 return;
             }
 
@@ -26,7 +26,7 @@ public class OrderView {
                     .collect(Collectors.toList());
 
             if (userOrders.isEmpty()) {
-                System.out.println("Bạn chưa có đơn hàng nào.");
+                System.out.println("📭 Bạn chưa có đơn hàng nào.");
             } else {
                 for (Order order : userOrders) {
                     System.out.println(order);
@@ -34,16 +34,28 @@ public class OrderView {
                 }
             }
 
-            System.out.println("1. Hủy đơn hàng theo ID");
-            System.out.println("0. Quay lại");
+            System.out.println("1.  Hủy đơn hàng theo ID");
+            System.out.println("0.  Quay lại");
 
             int choice = InputHelper.getInt("Chọn: ");
             switch (choice) {
-                case 1 -> {return;}
-                case 0 -> { return; }
-                default -> System.out.println("Lựa chọn không hợp lệ.");
+                case 1 -> cancelOrderById(username);
+                case 0 -> {
+                    return;
+                }
+                default -> System.out.println(" Lựa chọn không hợp lệ.");
             }
         }
     }
 
+    private void cancelOrderById(String username) {
+        int orderId = InputHelper.getInt("Nhập ID đơn hàng cần hủy: ");
+        boolean success = orderController.removeOrderByIdAndUsername(orderId, username);
+
+        if (success) {
+            System.out.println(" Đã hủy đơn hàng thành công.");
+        } else {
+            System.out.println(" Không tìm thấy đơn hàng phù hợp để hủy.");
+        }
+    }
 }

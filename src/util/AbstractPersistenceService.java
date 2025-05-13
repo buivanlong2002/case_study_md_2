@@ -1,8 +1,7 @@
 package util;
 
 import java.util.List;
-
-
+import java.util.ArrayList;
 
 //Template Method
 public abstract class AbstractPersistenceService<T> {
@@ -11,6 +10,7 @@ public abstract class AbstractPersistenceService<T> {
 
     public AbstractPersistenceService(String filePath) {
         this.filePath = filePath;
+        dataList = new ArrayList<>();  // Khởi tạo mặc định dataList
         loadFromFile();
     }
 
@@ -23,6 +23,7 @@ public abstract class AbstractPersistenceService<T> {
             }
         } catch (Exception e) {
             System.out.println("Không thể đọc file: " + e.getMessage());
+            // dataList đã được khởi tạo từ constructor, nên không cần khởi tạo lại ở đây
         }
     }
 
