@@ -1,32 +1,30 @@
 package service;
 
 import model.Order;
-import util.FileUtil;
+import util.AbstractPersistenceService;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class OrderService {
-    private final String FILE_PATH = "orders.dat";
-    private List<Order> orders;
+public class OrderService extends AbstractPersistenceService<Order> {
 
     public OrderService() {
-        orders = loadFromFile();
+        super("orders.dat");
     }
 
     public void saveOrder(Order order) {
-        orders.add(order);
+        dataList.add(order);
         saveToFile();
     }
 
     public List<Order> getAllOrders() {
-        return orders;
+        return dataList;
     }
 
     public List<Order> getOrdersByUsername(String username) {
         List<Order> result = new ArrayList<>();
-        for (Order order : orders) {
+        for (Order order : dataList) {
             if (order.getUsername().equalsIgnoreCase(username)) {
                 result.add(order);
             }
@@ -35,7 +33,7 @@ public class OrderService {
     }
 
     public boolean removeOrderByIdAndUsername(int orderId, String username) {
-        Iterator<Order> iterator = orders.iterator();
+        Iterator<Order> iterator = dataList.iterator();
         while (iterator.hasNext()) {
             Order order = iterator.next();
             if (order.getId() == orderId && order.getUsername().equalsIgnoreCase(username)) {
@@ -45,22 +43,5 @@ public class OrderService {
             }
         }
         return false;
-    }
-
-    private void saveToFile() {
-        try {
-            FileUtil.writeToFile(FILE_PATH, orders);
-        } catch (Exception e) {
-            System.out.println("Lỗi khi lưu file đơn hàng: " + e.getMessage());
-        }
-    }
-
-    private List<Order> loadFromFile() {
-        try {
-            return FileUtil.readFromFile(FILE_PATH);
-        } catch (Exception e) {
-            System.out.println("Không thể đọc file đơn hàng: " + e.getMessage());
-            return new ArrayList<>();
-        }
     }
 }

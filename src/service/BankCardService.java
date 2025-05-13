@@ -1,39 +1,35 @@
 package service;
 
 import model.BankCard;
-import util.FileUtil;
+import util.AbstractPersistenceService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BankCardService {
-    private List<BankCard> cardList = new ArrayList<>();
-    private final String FILE_PATH = "bankcards.dat";
+public class BankCardService extends AbstractPersistenceService<BankCard> {
 
     public BankCardService() {
-        loadFromFile();
+        super("bankcards.dat");
+        if (dataList == null) dataList = new ArrayList<>();
     }
 
-    // Thêm thẻ ngân hàng cho người dùng hiện tại
     public void addCard(BankCard card) {
-        // Kiểm tra nếu thẻ đã tồn tại với cùng username
-        for (BankCard existingCard : cardList) {
-            if (existingCard.getUsername().equals(card.getUsername()) && existingCard.getCardNumber().equals(card.getCardNumber())) {
+        for (BankCard existing : dataList) {
+            if (existing.getUsername().equals(card.getUsername()) &&
+                    existing.getCardNumber().equals(card.getCardNumber())) {
                 System.out.println("Thẻ này đã được liên kết với tài khoản.");
                 return;
             }
         }
-        cardList.add(card);
+        dataList.add(card);
         saveToFile();
-
     }
 
-    // Hiển thị danh sách thẻ của người dùng hiện tại (theo username)
     public void showCards(String username) {
         boolean found = false;
-        for (BankCard card : cardList) {
+        for (BankCard card : dataList) {
             if (card.getUsername().equals(username)) {
-                System.out.println(card);  // In ra thông tin thẻ
+                System.out.println(card);
                 found = true;
             }
         }
@@ -42,28 +38,23 @@ public class BankCardService {
         }
     }
 
-    // Xóa thẻ ngân hàng theo vị trí trong danh sách
     public void removeCard(String username, int index) {
-        if (index >= 0 && index < cardList.size()) {
-            BankCard cardToRemove = cardList.get(index);
-            if (cardToRemove.getUsername().equals(username)) {
-                cardList.remove(index);
+        if (index >= 0 && index < dataList.size()) {
+            BankCard card = dataList.get(index);
+            if (card.getUsername().equals(username)) {
+                dataList.remove(index);
                 saveToFile();
                 System.out.println("🗑 Đã xóa thẻ.");
             } else {
-                System.out.println("Bạn không thể xóa thẻ của người dùng khác.");
+                System.out.println("Không thể xóa thẻ của người dùng khác.");
             }
         } else {
             System.out.println("Vị trí không hợp lệ.");
         }
     }
-    public List<BankCard> getCardList() {
-        return cardList;
-    }
-    // Lấy danh sách thẻ ngân hàng của người dùng
-    public List<BankCard> getCardsForUser(String username) {
+    public List<BankCard> getCardsByUsername(String username) {
         List<BankCard> userCards = new ArrayList<>();
-        for (BankCard card : cardList) {
+        for (BankCard card : dataList) {
             if (card.getUsername().equals(username)) {
                 userCards.add(card);
             }
@@ -71,24 +62,21 @@ public class BankCardService {
         return userCards;
     }
 
-    // Lưu dữ liệu thẻ vào file
-    private void saveToFile() {
-        try {
-            FileUtil.writeToFile(FILE_PATH, cardList);
-        } catch (Exception e) {
-            System.out.println("Lỗi khi lưu file thẻ ngân hàng: " + e.getMessage());
-        }
-    }
-
-    // Tải dữ liệu thẻ từ file
-    private void loadFromFile() {
-        try {
-            List<BankCard> loaded = FileUtil.readFromFile(FILE_PATH);
-            if (loaded != null) {
-                cardList = loaded;
+    public List<BankCard> getCardsForUser(String username) {
+        List<BankCard> result = new ArrayList<>();
+        for (BankCard card : dataList) {
+            if (card.getUsername().equals(username)) {
+                result.add(card);
             }
-        } catch (Exception e) {
-            System.out.println("Không thể đọc file thẻ ngân hàng: " + e.getMessage());
+        }
+        return result;
+    }
+    public void delete(BankCard cardToRemove) {
+        if (dataList.remove(cardToRemove)) {
+            saveToFile();
+            System.out.println(" Đã xóa thẻ thành công.");
+        } else {
+            System.out.println(" Không thể xóa thẻ.");
         }
     }
 }

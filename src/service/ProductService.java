@@ -1,58 +1,39 @@
 package service;
 
 import model.Product;
-import util.FileUtil;
+import util.AbstractPersistenceService;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ProductService {
-    private List<Product> products;
-    private static final String FILE_PATH = "products.dat";
+public class ProductService extends AbstractPersistenceService<Product> {
 
     public ProductService() {
-        this.products = loadFromFile();
+        super("products.dat");
     }
 
     public void addProduct(Product p) {
-        products.add(p);
+        dataList.add(p);
         saveToFile();
     }
 
     public List<Product> getAll() {
-        return new ArrayList<>(products); // Trả về bản sao để tránh thay đổi ngoài ý muốn
+        return new ArrayList<>(dataList);
     }
 
     public List<Product> searchByName(String keyword) {
-        return products.stream()
+        return dataList.stream()
                 .filter(p -> p.getName().toLowerCase().contains(keyword.toLowerCase()))
                 .collect(Collectors.toList());
     }
 
     public void sortByPriceAsc() {
-        products.sort(Comparator.comparingDouble(Product::getPrice));
+        dataList.sort(Comparator.comparingDouble(Product::getPrice));
         saveToFile();
     }
 
     public void sortByDateDesc() {
-        products.sort((a, b) -> b.getImportDate().compareTo(a.getImportDate()));
+        dataList.sort((a, b) -> b.getImportDate().compareTo(a.getImportDate()));
         saveToFile();
-    }
-
-    private void saveToFile() {
-        try {
-            FileUtil.writeToFile(FILE_PATH, products);
-        } catch (Exception e) {
-            System.out.println("Lỗi khi lưu file sản phẩm: " + e.getMessage());
-        }
-    }
-
-    private List<Product> loadFromFile() {
-        try {
-            return FileUtil.readFromFile(FILE_PATH);
-        } catch (Exception e) {
-            System.out.println("Không thể đọc file sản phẩm: " + e.getMessage());
-            return new ArrayList<>();
-        }
     }
 }

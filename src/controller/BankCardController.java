@@ -5,6 +5,8 @@ import service.BankCardService;
 import util.InputHelper;
 import util.Session;
 
+import java.util.List;
+
 public class BankCardController {
     private final BankCardService bankCardService = new BankCardService();
 
@@ -48,20 +50,28 @@ public class BankCardController {
             return;
         }
 
-        bankCardService.showCards(username);  // Hiển thị danh sách thẻ của user hiện tại
+        // Hiển thị danh sách thẻ của user hiện tại
+        List<BankCard> userCards = bankCardService.getCardsByUsername(username);
+        if (userCards.isEmpty()) {
+            System.out.println(">> Bạn chưa có thẻ ngân hàng nào.");
+            return;
+        }
+
+        // In danh sách thẻ
+        for (int i = 0; i < userCards.size(); i++) {
+            System.out.println((i + 1) + ". " + userCards.get(i));
+        }
 
         int index = InputHelper.getInt("Nhập vị trí thẻ cần xóa: ") - 1;
 
-        // Kiểm tra lại nếu thẻ thuộc về người dùng hiện tại
-        if (index >= 0 && index < bankCardService.getCardList().size()) {
-            BankCard cardToRemove = bankCardService.getCardList().get(index);
-            if (cardToRemove.getUsername().equals(username)) {
-                bankCardService.removeCard(username ,index);  // Xóa thẻ nếu đúng username
-            } else {
-                System.out.println("Bạn không thể xóa thẻ của người dùng khác.");
-            }
+        if (index >= 0 && index < userCards.size()) {
+            BankCard cardToRemove = userCards.get(index);
+            // Xóa khỏi danh sách tổng nếu tìm thấy
+            bankCardService.delete(cardToRemove);
+            System.out.println(">> Xóa thẻ thành công.");
         } else {
             System.out.println("Vị trí không hợp lệ.");
         }
     }
+
 }

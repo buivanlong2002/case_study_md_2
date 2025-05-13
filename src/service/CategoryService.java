@@ -1,49 +1,50 @@
 package service;
 
 import model.Category;
-import util.FileUtil;
+import util.AbstractPersistenceService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CategoryService {
-    private final String CATEGORY_FILE = "categories.dat";
-    private List<Category> categories = new ArrayList<>();
+public class CategoryService extends AbstractPersistenceService<Category> {
 
     public CategoryService() {
-        loadFromFile();
+        super("categories.dat");
+        if (dataList == null) dataList = new ArrayList<>();
     }
 
+
     public void addCategory(String name) {
-        categories.add(new Category(name));
+        dataList.add(new Category(name));
         saveToFile();
-        System.out.println(">> Thêm danh mục thành công.");
+        System.out.println("✅ Thêm danh mục thành công.");
     }
+
 
     public List<Category> getAll() {
         loadFromFile();
-        return categories;
+        return dataList;
     }
 
-    private void saveToFile() {
-        try {
-            FileUtil.writeToFile(CATEGORY_FILE, categories);
-        } catch (Exception e) {
-            System.out.println("Lỗi khi lưu danh mục: " + e.getMessage());
+
+    public void removeCategory(int index) {
+        if (index >= 0 && index < dataList.size()) {
+            Category removed = dataList.remove(index);
+            saveToFile();
+            System.out.println(" Đã xoá danh mục: " + removed.getName());
+        } else {
+            System.out.println( " Vị trí không hợp lệ.");
         }
     }
 
-    private void loadFromFile() {
-        try {
-            List<Category> data = FileUtil.readFromFile(CATEGORY_FILE);
-            if (data != null) {
-                categories = data;
-            } else {
-                categories = new ArrayList<>();
-            }
-        } catch (Exception e) {
-            categories = new ArrayList<>();
-            System.out.println("Lỗi khi tải danh mục: " + e.getMessage());
+
+    public void updateCategory(int index, String newName) {
+        if (index >= 0 && index < dataList.size()) {
+            dataList.get(index).setName(newName);
+            saveToFile();
+            System.out.println(" Đã cập nhật danh mục.");
+        } else {
+            System.out.println(" Vị trí không hợp lệ.");
         }
     }
 }
